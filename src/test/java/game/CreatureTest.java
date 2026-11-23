@@ -3,6 +3,8 @@ package game;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -92,5 +94,27 @@ public class CreatureTest {
         Item corpse = world.item(1, 1, 0);
         assertNotNull(corpse);
         assertEquals("josh corpse", corpse.name());
+    }
+
+    @Test
+    void testDeathMessage() {
+        // Create a list to save the creature's messages.
+        List<String> messages = new ArrayList<>();
+
+        // Attach an AI that saves messages instead of ignoring them.
+        new CreatureAi(creature) {
+            // Replace onNotify() for this test only.
+            @Override
+            public void onNotify(String message) {
+                // Save each received message.
+                messages.add(message);
+            }
+        };
+
+        // Reduce the creature's starting HP from 100 to 0.
+        creature.modifyHp(-100, "Test damage");
+
+        // Check that the creature received the death message.
+        assertTrue(messages.contains("You die."));
     }
 }
